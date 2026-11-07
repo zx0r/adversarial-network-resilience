@@ -1,7 +1,7 @@
 # Academic Ethics, Dual-Use Technology & Legal Compliance
 
 ## 1. Research Scope & Academic Freedom
-This project constitutes architectural research into network transport resilience, cryptography, and traffic analysis countermeasures. All specifications, reference implementations, and benchmark configurations are provided strictly for:
+This project constitutes architectural research into network transport resilience, cryptography, and traffic analysis countermeasures. All specifications, architectural blueprints, and protocol models are provided strictly for:
 - Academic study and cybersecurity education.
 - Defending communications integrity and availability in adversarial networks.
 - Verification of network interference measurement methodologies (OONI / Citizen Lab alignment).

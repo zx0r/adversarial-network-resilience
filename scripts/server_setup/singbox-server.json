@@ -1,0 +1,77 @@
+{
+  "log": {
+    "level": "warn",
+    "timestamp": true
+  },
+  "inbounds": [
+    {
+      "type": "vless",
+      "tag": "vless-reality-in",
+      "listen": "::",
+      "listen_port": 443,
+      "users": [
+        {
+          "uuid": "e3b0c442-98fc-1c14-9afb-f4c8996fb924",
+          "flow": "xtls-rprx-vision"
+        }
+      ],
+      "tls": {
+        "enabled": true,
+        "server_name": "www.apple.com",
+        "reality": {
+          "enabled": true,
+          "handshake": {
+            "server": "www.apple.com",
+            "server_port": 443
+          },
+          "private_key": "YOUR_SINGBOX_REALITY_PRIVATE_KEY",
+          "short_id": [
+            "0123456789abcdef"
+          ]
+        }
+      }
+    },
+    {
+      "type": "hysteria2",
+      "tag": "hy2-in",
+      "listen": "::",
+      "listen_port": 8443,
+      "users": [
+        {
+          "password": "CHANGE_THIS_TO_STRONG_PASSWORD"
+        }
+      ],
+      "obfs": {
+        "type": "salamander",
+        "password": "CHANGE_THIS_TO_SALAMANDER_SECRET"
+      },
+      "tls": {
+        "enabled": true,
+        "certificate_path": "/etc/sing-box/cert.crt",
+        "key_path": "/etc/sing-box/private.key"
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "direct",
+      "tag": "direct"
+    },
+    {
+      "type": "block",
+      "tag": "block"
+    }
+  ],
+  "route": {
+    "rules": [
+      {
+        "ip_is_private": true,
+        "outbound": "block"
+      },
+      {
+        "protocol": "bittorrent",
+        "outbound": "block"
+      }
+    ]
+  }
+}

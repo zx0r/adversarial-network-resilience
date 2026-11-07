@@ -1,0 +1,46 @@
+name: CI Validation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate-configs:
+    name: Validate Configurations & Scripts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linting Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq yamllint shellcheck
+
+      - name: Validate JSON Templates
+        run: |
+          echo "Validating JSON files in scripts/..."
+          for file in $(find scripts -name "*.json"); do
+            echo "Checking $file..."
+            jq empty "$file"
+          done
+          echo "✓ All JSON templates valid."
+
+      - name: Validate YAML Templates
+        run: |
+          echo "Validating YAML files in scripts/..."
+          for file in $(find scripts -name "*.yaml" -o -name "*.yml"); do
+            echo "Checking $file..."
+            yamllint -d "{extends: default, rules: {line-length: disable, document-start: disable}}" "$file"
+          done
+          echo "✓ All YAML templates valid."
+
+      - name: ShellCheck Scripts
+        run: |
+          echo "Linting shell scripts in scripts/..."
+          for script in $(find scripts -name "*.sh"); do
+            echo "ShellChecking $script..."
+            shellcheck -e SC2086 "$script"
+          done
+          echo "✓ ShellCheck passed."

@@ -45,6 +45,10 @@ fi
 
 echo ">>> Writing WireGuard profile to ${OUTPUT_CONF}..."
 cat << EOF > "${OUTPUT_CONF}"
+# Cloudflare WARP Registration
+# Account ID: ${ID}
+# Account Token: ${TOKEN}
+
 [Interface]
 PrivateKey = ${PRIVATE_KEY}
 Address = ${IPV4}/32, ${IPV6}/128

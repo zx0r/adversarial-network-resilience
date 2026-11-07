@@ -1,0 +1,17 @@
+# .gitattributes - GitHub Linguist language detection configuration
+
+# --- Documentation ---
+*.md linguist-documentation
+LICENSE linguist-documentation
+docs/** linguist-documentation
+legal/** linguist-documentation
+
+# --- Configurations & Reference Templates ---
+scripts/server_setup/** linguist-documentation
+scripts/benchmarks/docker-compose.yml -linguist-detectable
+.github/** -linguist-detectable
+
+# --- Shell Automation & Test Harness ---
+scripts/benchmarks/*.sh linguist-documentation
+scripts/warp/*.sh linguist-documentation
+scripts/utils/*.sh linguist-documentation

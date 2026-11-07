@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # --- Network Impairment Emulator (WAN Node) ---
   wan-emulator:
-    image: alpine:3.20
+    image: alpine:latest
     container_name: mnp-wan-emulator
     cap_add:
       - NET_ADMIN
@@ -35,7 +35,7 @@ services:
 
   # --- Benchmark Test Client & Metric Collector ---
   client:
-    image: alpine:3.20
+    image: alpine:latest
     container_name: mnp-benchmark-client
     cap_add:
       - NET_ADMIN

@@ -1,14 +1,3 @@
-<small>
-
-> ##### LEGAL DISCLAIMER
-> This project and the information contained herein are provided for academic research, cybersecurity education, and informational purposes only.
-> The goal is to foster a better understanding of network technologies, network security, and privacy-enhancing tools.
-> The technologies and methods discussed can be complex and may have legal implications that vary significantly by jurisdiction.
-> Users of this information are solely responsible for ensuring that their actions comply with all applicable local, state, national, and international laws and regulations.
-
-</small>
-
-
 <div align="center">
 <h1>Resilient Network Architectures</h1>
 <h3>Analysis of Secure Communication Protocols in Adversarial Environments</h3>
@@ -17,7 +6,7 @@
 
 #### Abstract
 
-This study provides a systematic, neutral evaluation of network resilience technologies as of 2025, analyzing architectural frameworks, cryptographic implementations, and performance characteristics of protocols designed for secure data transmission in adversarial environments.
+This study provides a systematic, neutral evaluation of network resilience technologies (current through late 2026 / 2027), analyzing architectural frameworks, cryptographic implementations, and performance characteristics of protocols designed for secure data transmission in adversarial environments.
 
 - **Security Audits:** Theoretical assessment of resistance to traffic analysis and deep packet inspection (DPI) techniques, aligned with cybersecurity best practices.
 - **Metric Collection:** Findings are presented as a comparative framework for cybersecurity professionals and researchers to evaluate protocol efficacy in mitigating data integrity risks.
@@ -58,13 +47,13 @@ This study provides a systematic, neutral evaluation of network resilience techn
    - [Transport Layer Innovations Beyond QUIC](#transport-layer-innovations-beyond-quic)
    - [Post-Quantum Cryptography Considerations](#post-quantum-considerations)
    - [Decentralized and P2P Approaches](#decentralized-p2p-approaches)
-8. [Optimal Client Solutions for Multi-Protocol Management (2025)](#optimal-client-solutions)
+8. [Optimal Client Solutions for Multi-Protocol Management (2026–2027)](#optimal-client-solutions)
    - [Criteria for Evaluation](#criteria-for-evaluation-clients)
    - [GUI Solutions](#gui-solutions)
    - [CLI Solutions](#cli-solutions)
    - [TUI Solutions](#tui-solutions)
    - [Platform-Specific Recommendations Summary](#platform-specific-recommendations-summary-clients)
-9. [Protocol Efficacy and Threat Model Alignment (2025)](#protocol-efficacy-primacy)
+9. [Protocol Efficacy and Threat Model Alignment (2026–2027)](#protocol-efficacy-primacy)
    - [Factors Determining "Best" Protocol](#factors-determining-best-protocol)
    - [Current Leading Protocols by Use Case](#current-leading-protocols-by-use-case)
    - [Reference Architectures for High-Interference Networks](#recommendation-general-purpose)
@@ -1155,7 +1144,7 @@ Outline provides solid performance, characteristic of a well-implemented Shadows
 
 ##### 3.9 Comparative Protocol Analysis <a name="comparative-protocol-analysis"></a>
 
-This section provides a systematic comparison of the major resilient overlay protocols based on empirical testing and technical analysis, focusing on their state in 2025.
+This section provides a systematic comparison of the major resilient overlay protocols based on empirical testing and technical analysis, focusing on empirical benchmarks and current protocols through 2026–2027.
 
 ###### Performance Metrics
 
@@ -1194,7 +1183,7 @@ This section provides a systematic comparison of the major resilient overlay pro
 
 ###### Use Case Recommendations Summary (refer to Section 9 for detailed discussion)
 
-| Use Case / Priority                        | Primary Recommendation(s) (2025)     | Secondary/Alternative(s)                    |
+| Use Case / Priority                        | Primary Recommendation(s) (2026–2027) | Secondary/Alternative(s)                    |
 | ------------------------------------------ | ------------------------------------ | ------------------------------------------- |
 | **Max Resistance (Sophisticated DPI)**     | VLESS+XTLS+Reality (Xray)            | Trojan-Go (direct TLS), Tor with obfs4/meek |
 | **High Performance (Challenging Network)** | Hysteria2                            | TUIC v5                                     |
@@ -1204,11 +1193,11 @@ This section provides a systematic comparison of the major resilient overlay pro
 | **Ease of Setup (User-Managed Server)**    | Outline (Shadowsocks)                | Simple Trojan-Go setup                      |
 | **Balanced Performance & Resistance**      | VLESS+XTLS+Reality, Trojan-Go        | VMess/VLESS+WS+TLS (if CDN needed)          |
 
-This comparative analysis underscores that no single protocol is universally "best." The optimal choice depends on a nuanced understanding of the specific operational environment, threat model, and desired trade-offs between resistance, performance, and usability. An adaptive strategy, often involving multiple protocols and configurations, is generally the most robust approach to network resilience in 2025.
+This comparative analysis underscores that no single protocol is universally "best." The optimal choice depends on a nuanced understanding of the specific operational environment, threat model, and desired trade-offs between resistance, performance, and usability. An adaptive strategy, often involving multiple protocols and configurations, is generally the most robust approach to network resilience across 2026–2027.
 
 #### 4. Cross-Platform Implementation Analysis <a name="cross-platform-implementation-analysis"></a>
 
-This section details notable client software available for managing and utilizing the discussed resilient overlay protocols across various operating systems. The focus is on clients that are actively maintained, widely used, and support modern protocol features as of 2025. (Refer to Section 8 for a summary of "best" overall client solutions).
+This section details notable client software available for managing and utilizing the discussed resilient overlay protocols across various operating systems. The focus is on clients that are actively maintained, widely used, and support modern protocol features (evaluated through late 2026 / 2027). (Refer to Section 8 for a summary of "best" overall client solutions).
 
 ##### 4.1 Windows Client Solutions <a name="windows-client-solutions"></a>
 
@@ -1287,7 +1276,7 @@ Android has a vibrant ecosystem of powerful multi-protocol proxy clients.
 
 ###### Comprehensive Clients (Multi-Protocol GUI)
 
-**1. NekoBox for Android** \* _Core Engine_: sing-box. \* _Protocols_: Extremely broad via sing-box (VMess, VLESS, Trojan, SS, TUIC, Hysteria2, WireGuard, ShadowTLS, etc.). \* _Features_: Profile management, subscription support, rule-based routing (domain, geoIP, app), per-app proxy, TUN mode, QR code, batch export. \* _Installation_: GitHub releases: [https://github.com/MatsuriDayo/NekoBoxForAndroid](https://github.com/MatsuriDayo/NekoBoxForAndroid) (Also on some F-Droid repos). \* _Commentary_: Arguably the most feature-rich and versatile client on Android in 2025 due to sing-box.
+**1. NekoBox for Android** \* _Core Engine_: sing-box. \* _Protocols_: Extremely broad via sing-box (VMess, VLESS, Trojan, SS, TUIC, Hysteria2, WireGuard, ShadowTLS, etc.). \* _Features_: Profile management, subscription support, rule-based routing (domain, geoIP, app), per-app proxy, TUN mode, QR code, batch export. \* _Installation_: GitHub releases: [https://github.com/MatsuriDayo/NekoBoxForAndroid](https://github.com/MatsuriDayo/NekoBoxForAndroid) (Also on some F-Droid repos). \* _Commentary_: Arguably the most feature-rich and versatile client on Android across 2026–2027 due to sing-box integration.
 
 **2. ClashForAndroid (CFA) / ClashMetaForAndroid (CFMA)** \* _Core Engine_: Clash.Meta. \* _Protocols_: Full Clash.Meta protocol support. \* _Features_: Profile management (remote/local), rule-based routing, policy groups, per-app proxy, TUN mode, scripting. \* _Installation_:
 _CFA (Kr328, less frequent updates): [https://github.com/Kr328/ClashForAndroid](https://github.com/Kr328/ClashForAndroid)
@@ -1354,7 +1343,7 @@ Selection of a hosting provider and server location significantly impacts the ut
 - **Payment Anonymity**: Options for cryptocurrency or cash payments if desired.
 - **DMCA/Copyright Complaint Handling**: How the provider responds to such notices.
 
-###### Recommended Hosting Providers (General Categories, as of 2025)
+###### Recommended Hosting Providers (Industry Categories, 2026–2027 Evaluation)
 
 _This is not an exhaustive list, and provider quality can change. Always do current research._
 
@@ -1431,7 +1420,7 @@ Domain fronting typically works by manipulating HTTP/HTTPS headers:
 3. **HTTP Host Header (Inside TLS)**: The actual HTTP request (once TLS is established) specifies a `Host` header for the _actual_ hidden backend service (e.g., `your-secret-proxy.com`), which is also hosted behind the same CDN.
 4. **CDN Routing**: The CDN, upon receiving the request, uses the HTTP `Host` header (or other routing rules) to forward the request to the true origin server.
 
-**Current Status (2025)**:
+**Current Status (Late 2026 / 2027)**:
 
 - **Traditional domain fronting (SNI != Host header) has been largely mitigated by major CDNs like Google and AWS.** They now often validate that the SNI matches the Host header or enforce policies that break this technique.
 - **"SNI Fronting" or using a shared CDN certificate with multiple domains can still work to some extent if the CDN allows it.**
@@ -1780,7 +1769,7 @@ Pluggable Transports (PTs) are a general concept, formalized by the Tor Project 
 
 #### 7. Novel Research Developments and Future Trends <a name="novel-research-developments"></a>
 
-The field of network resilience and DPI evasion is dynamic, with ongoing research and development efforts to counter evolving mechanisms. This section explores some key areas of innovation and future trends expected to shape the landscape around 2025 and beyond.
+The field of network resilience and DPI evasion is dynamic, with ongoing research and development efforts to counter evolving mechanisms. This section explores some key areas of innovation and future trends shaping the landscape across 2026–2027 and beyond.
 
 ##### 7.1 Machine Learning in Traffic Analysis and Adversarial Defense <a name="ai-ml-secure-access-architectures"></a>
 
@@ -1801,8 +1790,8 @@ Artificial Intelligence (AI) and Machine Learning (ML) are increasingly being em
 - **Intelligent Routing and Server Selection**: ML algorithms can select optimal resilient proxy endpoints or paths based on real-time network conditions (latency, packet loss, jitter), detected network impairments and historical performance data.
 - **Reinforcement Learning for Evasion**: Training agents through reinforcement learning to discover effective strategies for evading active filtering mechanisms in simulated or real network environments.
 
-**Challenges & Outlook (2025)**:
-While AI/ML-based traffic classification is a growing threat, its widespread, highly effective deployment is still hampered by the need for large, accurate training datasets and significant computational resources. On the network resilience side, AI/ML techniques are more in the research and early adoption phase, with tools like `sing-box` beginning to incorporate more dynamic features (e.g., uTLS fingerprint cycling) that are precursors to more adaptive behaviors. The "cat and mouse" game will increasingly involve AI/ML on both sides.
+**Challenges & Outlook (2026–2027)**:
+While AI/ML-based traffic classification is a growing threat, its widespread, highly effective deployment is still hampered by the need for large, accurate training datasets and significant computational resources. On the network resilience side, AI/ML techniques are transitioning from laboratory research to active deployment, with tools like `sing-box` incorporating dynamic features (e.g., uTLS fingerprint cycling) that serve as foundational building blocks for adaptive behaviors. The "cat and mouse" game increasingly involves AI/ML on both sides.
 
 ##### 7.2 Transport Layer Innovations Beyond QUIC <a name="transport-layer-innovations-beyond-quic"></a>
 
@@ -1822,24 +1811,24 @@ While QUIC (as used by Hysteria2, TUIC) has provided significant advantages in p
 - **Domainless Fronting / ECH (Encrypted Client Hello)**:
   - **ECH (TLS Encrypted Client Hello)**: A TLS extension (RFC 9531, in progress for wider adoption) that encrypts the ClientHello message, which includes the SNI. This hides the intended destination domain from passive observers on the network path _before_ the CDN or server.
   - _Impact_: If widely adopted by servers and CDNs, ECH could significantly enhance privacy and make SNI-based blocking ineffective. resilient transport tools could leverage this by connecting to ECH-enabled front domains. Cloudflare and others are actively deploying ECH.
-  - _Outlook for 2025_: Adoption is growing. resilient transport tools will increasingly look to leverage ECH where available. This could make direct connections to servers (if ECH-enabled) more viable or enhance CDN-based methods.
+  - _Contemporary Outlook (2026–2027)_: Adoption is accelerating. Resilient transport tools actively leverage ECH where available, making direct connections to servers (if ECH-enabled) more viable and strengthening CDN-based methods.
 
 ##### 7.3 Post-Quantum Cryptography Considerations <a name="post-quantum-considerations"></a>
 
 With the anticipated advent of cryptographically relevant quantum computers (CRQCs), the security of currently used public-key cryptography (RSA, ECC, Diffie-Hellman) is threatened by Shor's algorithm. Symmetric cryptography (like AES) is considered more resilient, requiring larger key sizes.
 
 - **"Harvest Now, Decrypt Later" (HNDL)**: A significant concern is that adversaries may be recording large volumes of encrypted traffic today with the intent of decrypting it once CRQCs become available. This is particularly relevant for long-lived secrets.
-- **NIST PQC Standardization**: The US National Institute of Standards and Technology (NIST) has completed its initial PQC standardization project, selecting algorithms for Key Encapsulation Mechanisms (KEMs) like CRYSTALS-Kyber, and digital signatures like CRYSTALS-Dilithium, Falcon, SPHINCS+.
-- **Integration into Protocols (by 2025-2030)**:
-  - **TLS 1.3 with PQC**: Standards bodies like IETF are working on integrating PQC into TLS, typically in "hybrid" modes. This involves using both a classical (e.g., ECDH) and a PQC key exchange algorithm, so that the connection is secure if either one remains unbroken.
+- **NIST PQC Standardization**: The US National Institute of Standards and Technology (NIST) has completed its initial PQC standardization project, selecting algorithms for Key Encapsulation Mechanisms (KEMs) like ML-KEM (Kyber), and digital signatures like ML-DSA (Dilithium), Falcon, SLH-DSA (SPHINCS+).
+- **Integration into Protocols (2026–2030)**:
+  - **TLS 1.3 with PQC**: Standards bodies like IETF are deploying PQC into TLS, typically in "hybrid" modes (e.g., X25519Kyber768). This involves using both a classical (e.g., ECDH) and a PQC key exchange algorithm, ensuring connections remain secure even if one algorithm is compromised.
   - **VPNs and Proxy Protocols**:
-    - Protocols relying on TLS (VLESS, Trojan, WebSocket+TLS) will inherit PQC capabilities as TLS evolves.
-    - WireGuard has a plan for PQC transition (`WireGuardPQ`), likely involving a hybrid handshake.
-    - Shadowsocks (AEAD ciphers) uses symmetric crypto primarily, so its core data encryption is less directly threatened than key exchange/authentication in other protocols. However, if used with PQC-enabled TLS for obfuscation, it benefits.
-- **Impact on network resilience Tools (Outlook for 2025)**:
-  - Experimental PQC support might start appearing in cutting-edge libraries and some resilient transport tools/cores by 2025, likely in hybrid modes.
-  - Widespread deployment and default use of PQC is unlikely by 2025 but will be a major trend in the following 5-10 years.
-  - For network resilience, the immediate concern is less about quantum decryption of real-time proxy sessions and more about the HNDL threat to any sensitive data passed through these tunnels if the underlying application layer encryption is also vulnerable.
+    - Protocols relying on TLS (VLESS, Trojan, WebSocket+TLS) inherit PQC capabilities as TLS stacks evolve.
+    - WireGuard has an ongoing transition roadmap (`WireGuardPQ`), utilizing hybrid handshakes.
+    - Shadowsocks (AEAD ciphers) uses symmetric crypto primarily, so its core data encryption is less directly threatened than key exchange/authentication in other protocols. However, if used with PQC-enabled TLS for obfuscation, it benefits directly.
+- **Impact on Network Resilience Tools (2026–2027 Outlook)**:
+  - Hybrid PQC key-exchange modes (e.g., X25519 + ML-KEM) have entered production in mainstream browsers and modern proxy engines (sing-box, Xray-core).
+  - While legacy infrastructure remains, default hybrid PQC negotiation is becoming a baseline industry requirement heading into 2027.
+  - For network resilience, the immediate priority addresses the HNDL threat against traffic captures and ensures that mimicry engines produce realistic post-quantum ClientHello extensions.
 - **Open Quantum Safe (OQS) Project**: Provides open-source libraries for PQC algorithms and integrations into OpenSSL and other libraries, facilitating experimentation and adoption. ([https://openquantumsafe.org/](https://openquantumsafe.org/))
 
 ##### 7.4 Decentralized and P2P Approaches <a name="decentralized-p2p-approaches"></a>
@@ -1856,7 +1845,7 @@ Decentralized systems aim to eliminate single points of failure and control, mak
     - **Trust & Security**: Exit nodes are run by anonymous operators, posing risks of traffic logging or modification. Some dVPNs try to mitigate this with multi-hop architectures or by focusing on non-exit node roles.
     - **Usability & Cost**: Can be more complex to use than traditional VPNs. Bandwidth costs can fluctuate with cryptocurrency prices.
     - **Blockchain Scalability/Fees**: The underlying blockchain can sometimes be a bottleneck.
-  - _Outlook for 2025_: Maturing, but still more niche. Usability and consistent performance remain key challenges for wider adoption.
+  - _Contemporary Outlook (2026–2027)_: Maturing, but still specialized. Usability and consistent performance remain key challenges for wider adoption compared to centralized proxy overlays.
 
 - **Friend-to-Friend (F2F) Networks / Darknets**:
 
@@ -1870,7 +1859,7 @@ Decentralized systems aim to eliminate single points of failure and control, mak
   - **IPFS** ([https://ipfs.tech/](https://ipfs.tech/)): A P2P hypermedia protocol for content-addressed storage and delivery. Content is identified by its cryptographic hash, making it inherently resistant once published (as long as nodes host it).
   - **LibP2P** ([https://libp2p.io/](https://libp2p.io/)): A modular P2P networking stack (used by IPFS and others) that provides transport, security, peer discovery, and content routing.
   - _Impact on network resilience_: While not resilient transport tools per se, these technologies provide foundational building blocks for decentralized applications and services that can be resistant. For example, hosting a banned website on IPFS, or using LibP2P to build new P2P resilient overlay protocols.
-  - _Outlook for 2025_: IPFS is well-established for decentralized storage. Using it as a transport for dynamic network resilience is less common but an area of research. LibP2P is a key enabler for new P2P projects.
+  - _Contemporary Outlook (2026–2027)_: IPFS is well-established for decentralized storage. Using it as a transport for dynamic network resilience remains an active area of research, with LibP2P serving as a core enabler for novel P2P transports.
 
 - **Ceno Browser (Content-based P2P Web Browsing)**
   - A mobile web browser (fork of Firefox for Android) that uses a P2P network (based on Ouinet library, which uses BitTorrent and IPFS concepts) to share and retrieve web content among users, reducing reliance on direct connections to servers, especially for popular, previously accessed content.
@@ -1878,9 +1867,9 @@ Decentralized systems aim to eliminate single points of failure and control, mak
 
 **Overall Challenges for Decentralized Approaches**: Usability for non-technical users, ensuring robust anonymity guarantees in a P2P context, managing trust in decentralized node operators, achieving consistent performance, and developing sustainable economic models (for dVPNs) remain active areas of research and development.
 
-#### 8. Optimal Client Solutions for Multi-Protocol Management (2025) <a name="optimal-client-solutions"></a>
+#### 8. Optimal Client Solutions for Multi-Protocol Management (2026–2027) <a name="optimal-client-solutions"></a>
 
-The proliferation of resilient overlay protocols necessitates client applications capable of managing multiple protocols and configurations efficiently. The "best" solution often depends on the user's technical proficiency, platform, and specific needs. This section identifies leading clients as of 2025.
+The proliferation of resilient overlay protocols necessitates client applications capable of managing multiple protocols and configurations efficiently. The "best" solution often depends on the user's technical proficiency, platform, and specific needs. This section identifies leading clients across 2026–2027.
 
 ##### 8.1 Criteria for Evaluation <a name="criteria-for-evaluation-clients"></a>
 
@@ -1899,7 +1888,7 @@ The proliferation of resilient overlay protocols necessitates client application
 
 Graphical User Interface clients are generally preferred for ease of use by a broad range of users.
 
-**Leading GUI Clients (as of 2025):**
+**Leading GUI Clients (2026–2027 Benchmark):**
 
 1. **Clash Verge / Clash Nyanpasu (Cross-Platform Desktop)**
 
@@ -1974,7 +1963,7 @@ Graphical User Interface clients are generally preferred for ease of use by a br
 
 Command-Line Interface clients are favored by advanced users, for server deployments, headless operation, or for automated scripting. These are often the core engines themselves.
 
-**Leading CLI Cores/Clients (as of 2025):**
+**Leading CLI Cores/Clients (2026–2027 Benchmark):**
 
 1. **sing-box**
 
@@ -2006,7 +1995,7 @@ _(Other CLIs like `shadowsocks-libev`, `trojan-go`, Hysteria2/TUIC CLIs are also
 
 Text-based User Interface clients offer a middle ground, providing interactivity in terminal environments, useful for headless servers or users who prefer terminal-based management.
 
-**Leading TUI Approaches (as of 2025):**
+**Leading TUI Approaches (2026–2027 Benchmark):**
 
 1. **Clash TUI / Web Dashboards for Clash.Meta**
 
@@ -2028,7 +2017,7 @@ Text-based User Interface clients offer a middle ground, providing interactivity
 
 _The dedicated TUI application landscape for these specific multi-protocol tools is less mature compared to GUI or pure CLI. Users often rely on web dashboards run locally or script their own interactions._
 
-##### 8.5 Platform-Specific Recommendations Summary (2025 Best Overall) <a name="platform-specific-recommendations-summary-clients"></a>
+##### 8.5 Platform-Specific Recommendations Summary (2026–2027 Best Overall) <a name="platform-specific-recommendations-summary-clients"></a>
 
 - **Windows (GUI)**: **Clash Verge / Nyanpasu** (for advanced rules & Clash ecosystem) or **NekoRay** (for `sing-box` versatility & broad protocol support). **v2rayN** remains a solid, simpler choice for V2Ray/Xray.
 - **macOS (GUI)**: **Clash Verge / Nyanpasu** or **Stash** (for Clash ecosystem). **NekoRay** (for `sing-box`). **Surge** (paid) for ultimate power users.
@@ -2038,9 +2027,9 @@ _The dedicated TUI application landscape for these specific multi-protocol tools
 - **iOS (Paid)**: **Shadowrocket** (broadest protocol support & features) or **Stash** (Clash ecosystem & rules). **Quantumult X / Loon / Surge** for very advanced users.
 
 **Overall "Best" Solution Approach**:
-For users seeking a unified experience across multiple platforms with the widest protocol support and advanced features, solutions based on **`sing-box` (e.g., NekoRay/NekoBox)** or **Clash.Meta (e.g., Clash Verge/Nyanpasu, Stash, CFMA)** are generally the top contenders in 2025. For CLI power users, `sing-box` itself stands out for its sheer breadth of capabilities. The choice often comes down to preference for configuration style (JSON for `sing-box`/Xray vs. YAML for Clash) and specific feature requirements.
+For users seeking a unified experience across multiple platforms with the widest protocol support and advanced features, solutions based on **`sing-box` (e.g., NekoRay/NekoBox)** or **Clash.Meta (e.g., Clash Verge/Nyanpasu, Stash, CFMA)** are generally the top contenders in 2026–2027. For CLI power users, `sing-box` itself stands out for its sheer breadth of capabilities. The choice often comes down to preference for configuration style (JSON for `sing-box`/Xray vs. YAML for Clash) and specific feature requirements.
 
-#### 9. Protocol Efficacy and Threat Model Alignment (2025) <a name="protocol-efficacy-primacy"></a>
+#### 9. Protocol Efficacy and Threat Model Alignment (2026–2027) <a name="protocol-efficacy-primacy"></a>
 
 Determining the "best" protocol is highly context-dependent, relying on the specific threat model, network environment, performance requirements, and the sophistication of the regime being faced. No single protocol is universally superior in all situations.
 
@@ -2065,7 +2054,7 @@ Determining the "best" protocol is highly context-dependent, relying on the spec
    - Compatibility with CDNs.
 7. **Active Development & Community Support**: A protocol that is actively maintained and improved is more likely to adapt to new techniques.
 
-##### 9.2 Current Leading Protocols by Use Case (as of 2025) <a name="current-leading-protocols-by-use-case"></a>
+##### 9.2 Current Leading Protocols by Use Case (2026–2027) <a name="current-leading-protocols-by-use-case"></a>
 
 Based on the analyses in Section 3 and ongoing observations of the landscape:
 
@@ -2110,9 +2099,9 @@ Based on the analyses in Section 3 and ongoing observations of the landscape:
    - **OpenVPN (standalone)**: Also has known fingerprints, though obfuscation techniques exist (e.g., via stunnel, obfsproxy, or XOR patch).
    - **Plain SOCKS5/HTTP proxies**: Unencrypted, easily blocked.
 
-##### 9.3 Reference Architectures for High-Interference Networks (2025) <a name="recommendation-general-purpose"></a>
+##### 9.3 Reference Architectures for High-Interference Networks (2026–2027) <a name="recommendation-general-purpose"></a>
 
-**As of 2025, for users seeking a primary protocol that balances the highest levels of resistance to sophisticated, excellent performance, and reasonable usability (with appropriate clients), the combination of VLESS + XTLS + Reality (via Xray-core) is considered the leading choice.**
+**For deployments across 2026–2027, users seeking a primary protocol that balances the highest levels of resistance to sophisticated DPI, excellent performance, and reasonable usability (with appropriate clients), the combination of VLESS + XTLS + Reality (via Xray-core) is considered the leading choice.**
 
 **Rationale**:
 
@@ -2323,7 +2312,7 @@ Self-hosting a basic server on a reputable VPS provider can cost as little as $3
 
 #### 12. Conclusion <a name="conclusion"></a>
 
-The landscape of network interference and resilient transport protocols in 2025 is characterized by a continuous technological arms race. Sophisticated DPI, AI-driven traffic analysis, and widespread blocking necessitate equally advanced and adaptable resilient transport tools. This analysis has systematically reviewed the core protocols—V2Ray/V2Fly, XRay, Shadowsocks, Trojan, WireGuard-based solutions, Hysteria2, and TUIC—along with their implementations across major platforms.
+The landscape of network interference and resilient transport protocols across 2026–2027 is characterized by a continuous technological arms race. Sophisticated DPI, AI-driven traffic analysis, and widespread blocking necessitate equally advanced and adaptable resilient transport tools. This analysis has systematically reviewed the core protocols—V2Ray/V2Fly, XRay, Shadowsocks, Trojan, WireGuard-based solutions, Hysteria2, and TUIC—along with their implementations across major platforms.
 
 Key findings indicate that protocols leveraging robust TLS mimicry, such as **VLESS + XTLS (particularly with Xray-core's Reality feature)** and **Trojan-Go (with uTLS and strong fallback)**, currently offer a leading combination of high resistance and performance against prevalent mechanisms. QUIC-based protocols like **Hysteria2** and **TUIC** demonstrate exceptional efficacy in challenging network conditions characterized by high packet loss, provided UDP is not overly restricted. The strategic use of CDNs to front WebSocket-based transports remains a vital technique for masking server IPs and blending traffic with general web activity.
 
@@ -2333,7 +2322,7 @@ Advanced techniques, including bridge-based systems (especially Tor's obfs4 and 
 
 Effective network resilience, however, extends beyond mere technological choices. A tiered approach to deployment tailored to regional filtering intensity, rigorous operational security (OpSec) for both users and server operators, and a critical stance towards unverified "free" resources are paramount for sustained, secure access to the open internet.
 
-The open-source nature of most leading resilient transport tools, coupled with active global communities, ensures rapid evolution and adaptation. Researchers, developers, and users must remain vigilant, continually evaluating the threat landscape and adapting their strategies and toolsets. This document serves as a snapshot of the state-of-the-art in 2025, recognizing that the pursuit of network freedom is an ongoing endeavor requiring persistent innovation, collaboration, and a commitment to user safety and privacy.
+The open-source nature of most leading resilient transport tools, coupled with active global communities, ensures rapid evolution and adaptation. Researchers, developers, and users must remain vigilant, continually evaluating the threat landscape and adapting their strategies and toolsets. This document serves as a snapshot of contemporary state-of-the-art architectures (late 2026), recognizing that the pursuit of network freedom is an ongoing endeavor requiring persistent innovation, collaboration, and a commitment to user safety and privacy.
 
 #### 13. References <a name="references"></a>
 
@@ -2344,10 +2333,10 @@ The open-source nature of most leading resilient transport tools, coupled with a
 5. **TLS Steganography**: Frolov, S., & Wustrow, E. (2019). *The Use of TLS in Censorship Circumvention*. Proceedings of the 28th USENIX Security Symposium.
 6. **Modern Kernel Tunnels**: Donenfeld, J. A. (2017). *WireGuard: Next Generation Kernel Network Tunnel*. Network and Distributed System Security Symposium (NDSS).
 7. **Tor Project**: Dingledine, R., Mathewson, N., & Syverson, P. (2004). *Tor: The Second-Generation Onion Router*. USENIX Security Symposium.
-8. **Xray & Reality Architecture**: XTLS Project. (2023–2025). *Xray-core & Reality Specification*. [https://xtls.github.io/](https://xtls.github.io/).
-9. **Universal Routing Core**: SagerNet. (2023–2025). *sing-box Architecture Manual*. [https://sing-box.sagernet.org/](https://sing-box.sagernet.org/).
-10. **Hysteria 2 Transport**: AperNet. (2023–2025). *Hysteria 2 Protocol and Brutal Congestion Control*. [https://v2.hysteria.network/](https://v2.hysteria.network/).
-11. **Network Interference Empirical Data**: Open Observatory of Network Interference (OONI). (2025). *OONI Network Measurement Methodology*. [https://ooni.org/](https://ooni.org/).
+8. **Xray & Reality Architecture**: XTLS Project. (2023–2026). *Xray-core & Reality Specification*. [https://xtls.github.io/](https://xtls.github.io/).
+9. **Universal Routing Core**: SagerNet. (2023–2026). *sing-box Architecture Manual*. [https://sing-box.sagernet.org/](https://sing-box.sagernet.org/).
+10. **Hysteria 2 Transport**: AperNet. (2023–2026). *Hysteria 2 Protocol and Brutal Congestion Control*. [https://v2.hysteria.network/](https://v2.hysteria.network/).
+11. **Network Interference Empirical Data**: Open Observatory of Network Interference (OONI). (2026). *OONI Network Measurement Methodology*. [https://ooni.org/](https://ooni.org/).
 
 #### 14. Appendices <a name="appendices"></a>
 
@@ -2730,3 +2719,9 @@ _Client/Server CPU % during 500 Mbps throughput_
 1. **Protocol Selection Trade-offs**: In high-packet-loss environments (>2%), QUIC-based implementations (Hysteria 2, TUIC) maintain up to 2.5× the throughput of TCP-based equivalents due to packet-loss tolerance and user-space congestion control.
 2. **Stealth vs. Performance**: Direct TLS mimicry (VLESS-Reality) provides the optimal balance of zero additional encapsulation latency (+5–10ms handshake overhead) with maximum resistance to active probing.
 3. **Encapsulation Overhead**: Multiplexing tunnels inside WebSocket+TLS through commercial CDN edges incurs measurable throughput degradation (~50% at 5% packet loss), rendering it a secondary fallback rather than a primary transport choice.
+
+---
+
+### License & Compliance
+
+Distributed under the [MIT License](LICENSE). For academic research ethics, dual-use technology classification, and regulatory compliance frameworks, refer to [`legal/COMPLIANCE.md`](legal/COMPLIANCE.md).

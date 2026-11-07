@@ -18,14 +18,15 @@ This study provides a systematic, neutral evaluation of network resilience techn
 1. [Introduction](#introduction)
 2. [Methodology](#methodology)
 3. [Core Resilient Network Protocols](#core-resilient-network-protocols)
+   - [Architectural Taxonomy & Decoupling Model](#architectural-taxonomy)
    - [V2Ray/V2Fly Ecosystem](#v2rayv2fly-ecosystem)
    - [XRay and XTLS Technology](#xray-and-xtls-technology)
    - [Shadowsocks Protocol Family](#shadowsocks-protocol-family)
    - [Trojan Protocol](#trojan-protocol)
-   - [WireGuard-based Solutions](#wireguard-based-solutions)
+   - [WireGuard and AmneziaWG Implementations](#wireguard-based-solutions)
    - [Hysteria/Hysteria2](#hysteriahysteria2)
    - [TUIC Protocol](#tuic-protocol)
-   - [Outline](#outline)
+   - [Turnkey Orchestration Systems (Outline)](#outline)
    - [Comparative Protocol Analysis](#comparative-protocol-analysis)
 4. [Cross-Platform Implementation Analysis](#cross-platform-implementation-analysis)
    - [Windows Client Solutions](#windows-client-solutions)
@@ -102,6 +103,31 @@ This analysis employs a multi-faceted methodology to evaluate network resilience
 Performance metrics were gathered using standardized testing tools including iperf3, ping, traceroute, and custom traffic analysis scripts. All tests were performed across multiple geographic regions to account for network path variations.
 
 #### 3. Core Resilient Network Protocols <a name="core-resilient-network-protocols"></a>
+
+##### 3.0 Architectural Taxonomy & Decoupling Model <a name="architectural-taxonomy"></a>
+
+A persistent deficiency in legacy network resilience discourse is the conflation of raw transport layers, tunnel framing, steganographic mimicry, and user-space routing engines. To enforce engineering rigor, this study decouples the resilience stack into four distinct architectural tiers:
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│ Tier 4: Multi-Protocol Routing Engines & Cores                         │
+│ (sing-box v1.11+, Xray-core, Mihomo Core)                              │
+├────────────────────────────────────────────────────────────────────────┤
+│ Tier 3: Active Steganography & Fingerprint Morphing                    │
+│ (XTLS Reality, uTLS JA3/JA4, ShadowTLS, Salamander OBFS, AWG Headers)  │
+├────────────────────────────────────────────────────────────────────────┤
+│ Tier 2: Tunnel Encapsulation & Multiplexing                            │
+│ (VLESS, Trojan, Shadowsocks-2022, TUIC v5, AmneziaWG / WireGuard)      │
+├────────────────────────────────────────────────────────────────────────┤
+│ Tier 1: Transport Underlay & Congestion Control                        │
+│ (TCP, QUIC [RFC 9000], WebSocket/TLS, gRPC, Brutal CC, BBRv3)          │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+- **Tier 1 (Transport Underlay & Congestion Control)**: Governs byte delivery, packet pacing, and loss recovery. Protocols like Hysteria 2 operate at this tier using user-space QUIC and rate-based congestion control (Brutal) to bypass standard TCP backoff under packet loss.
+- **Tier 2 (Tunnel Encapsulation & Multiplexing)**: Defines authentication headers, session identifiers, and frame boundaries (e.g., VLESS, Trojan, Shadowsocks-2022, WireGuard/AmneziaWG).
+- **Tier 3 (Active Steganography & TLS Mimicry)**: Cloaks tunnel traffic against passive heuristic classification and active probing. Techniques range from borrowing live certificates and handshakes from legitimate destinations (XTLS Reality) to header padding and message-type randomization (AmneziaWG).
+- **Tier 4 (Multi-Protocol Routing Cores)**: User-space daemons orchestrating transparent proxying (TUN/TPROXY), rule-based DNS resolution, and connection multiplexing (e.g., `sing-box`, `Xray-core`, `Mihomo`). Turnkey systems like Outline are administrative wrappers around Tier 2/Tier 4 rather than distinct wire protocols.
 
 ##### 3.1 V2Ray/V2Fly Ecosystem <a name="v2rayv2fly-ecosystem"></a>
 
@@ -466,60 +492,62 @@ Basic Shadowsocks (even with AEAD) has a discernible fingerprint to advanced DPI
 **Windows Installation**:
 
 ```bash
-# Download Shadowsocks-Windows from GitHub
+# Download Shadowsocks-Windows or shadowsocks-rust release:
+# https://github.com/shadowsocks/shadowsocks-rust/releases
 # https://github.com/shadowsocks/shadowsocks-windows/releases
 
 # Alternative with Scoop:
-scoop install shadowsocks-windows
+scoop install shadowsocks-rust
 ```
 
 **macOS Installation**:
 
 ```bash
-# Install with Homebrew (shadowsocks-libev for core)
-brew install shadowsocks-libev
+# Install shadowsocks-rust via Homebrew (modern reference implementation):
+brew install shadowsocks-rust
 
 # For GUI client:
-brew install --cask shadowsocksx-ng-r # Or other SS compatible clients
+# Use Clash Verge Rev, NekoRay, or ShadowsocksX-NG
 ```
 
 **Linux Installation**:
 
 ```bash
-# For Debian/Ubuntu (shadowsocks-libev)
-apt update
-apt install shadowsocks-libev
+# shadowsocks-rust (recommended modern core with SS-2022 support)
+# Download precompiled binary or install via cargo:
+cargo install shadowsocks-rust
 
-# For CentOS/RHEL
-yum install shadowsocks-libev
+# For Arch Linux:
+pacman -S shadowsocks-rust
 
-# For Arch Linux
-pacman -S shadowsocks-libev
+# Debian/Ubuntu (via official release binary):
+curl -sSL https://github.com/shadowsocks/shadowsocks-rust/releases/download/v1.22.0/shadowsocks-v1.22.0.x86_64-unknown-linux-gnu.tar.xz | tar -xJ -C /usr/local/bin/
 ```
 
 **Android Installation**:
 
 - Install Shadowsocks for Android from Google Play Store or F-Droid.
-- Or use comprehensive clients like NekoBox or v2rayNG which support SS.
-- Import configuration via QR code or manually.
+- Or use comprehensive multi-protocol clients like NekoBox or v2rayNG which natively support SS-2022.
+- Import configuration via QR code or URI (`ss://`).
 
 **iOS Installation**:
 
-- Install Shadowrocket or Potatso Lite from App Store.
+- Install Shadowrocket, Stash, or Loon from App Store.
 - Import configuration via QR code or URL.
 
-**Basic Client Configuration (shadowsocks-libev `ss-local`)**:
+**Basic Client Configuration (shadowsocks-rust `sslocal`)**:
 
 ```json
-// config.json for ss-local
+// config.json for sslocal (Shadowsocks-2022)
 {
   "server": "your-server.com",
   "server_port": 8388,
-  "password": "your-password",
-  "method": "chacha20-ietf-poly1305", // Or "2022-blake3-aes-128-gcm" for SS-2022
+  "password": "your-base64-key-here",
+  "method": "2022-blake3-aes-128-gcm",
   "local_address": "127.0.0.1",
-  "local_port": 1080
-  // For v2ray-plugin:
+  "local_port": 1080,
+  "mode": "tcp_and_udp"
+  // For v2ray-plugin obfuscation:
   // "plugin": "v2ray-plugin",
   // "plugin_opts": "tls;host=your-cdn-domain.com;path=/yourpath;mux=0"
 }
@@ -527,17 +555,16 @@ pacman -S shadowsocks-libev
 
 ###### Recommendations
 
-- Use AEAD ciphers (chacha20-ietf-poly1305 or aes-256-gcm) or preferably Shadowsocks 2022 Edition ciphers.
-- **Crucially, combine with a robust pluggable transport like `v2ray-plugin` (using WebSocket and TLS) or `cloak` for environments with active DPI.**
-- Consider CDN fronting with WebSocket + TLS configurations for `v2ray-plugin`.
+- Standardize on Shadowsocks 2022 Edition ciphers (`2022-blake3-aes-128-gcm` or `2022-blake3-aes-256-gcm`).
+- **Crucially, combine with a robust pluggable transport like `v2ray-plugin` (WebSocket + TLS) or `cloak` in networks with active DPI probing.**
+- Prefer `shadowsocks-rust` over the deprecated `shadowsocks-libev` to ensure protocol compliance and anti-replay defense.
 
 ###### Repository References
 
-- Shadowsocks-libev (C implementation): [https://github.com/shadowsocks/shadowsocks-libev](https://github.com/shadowsocks/shadowsocks-libev)
+- Shadowsocks-rust (Active Rust Reference Implementation): [https://github.com/shadowsocks/shadowsocks-rust](https://github.com/shadowsocks/shadowsocks-rust)
 - Shadowsocks-Windows (C# client): [https://github.com/shadowsocks/shadowsocks-windows](https://github.com/shadowsocks/shadowsocks-windows)
-- ShadowsocksX-NG (macOS client): [https://github.com/shadowsocks/ShadowsocksX-NG](https://github.com/shadowsocks/ShadowsocksX-NG) (Note: -R variants often more up-to-date)
 - Shadowsocks Android: [https://github.com/shadowsocks/shadowsocks-android](https://github.com/shadowsocks/shadowsocks-android)
-- Shadowsocks Organization (SIPs, specs): [https://github.com/shadowsocks/shadowsocks-org](https://github.com/shadowsocks/shadowsocks-org)
+- Shadowsocks Organization (SIPs, SS-2022 specs): [https://github.com/shadowsocks/shadowsocks-org](https://github.com/shadowsocks/shadowsocks-org)
 
 ##### 3.4 Trojan Protocol <a name="trojan-protocol"></a>
 
@@ -673,35 +700,40 @@ brew install trojan-go
 - Trojan-Go (Go): [https://github.com/p4gefau1t/trojan-go](https://github.com/p4gefau1t/trojan-go)
 - Igniter (Android Trojan client): [https://github.com/trojan-gfw/igniter](https://github.com/trojan-gfw/igniter) (may be less maintained, prefer multi-protocol clients)
 
-##### 3.5 WireGuard-based Solutions <a name="wireguard-based-solutions"></a>
+##### 3.5 WireGuard and AmneziaWG Implementations <a name="wireguard-based-solutions"></a>
 
-WireGuard represents a modern approach to VPN technology with superior performance characteristics, though with limited inherent obfuscation capabilities for DPI.
+Standard WireGuard represents a modern, kernel-accelerated VPN protocol with exceptional throughput and minimal latency. However, its strict cryptographic framing lacks inherent obfuscation, making raw WireGuard easily identifiable and blockable by modern DPI systems. To maintain WireGuard's performance in adversarial networks, specialized obfuscation layers and protocol forks—most prominently **AmneziaWG (AWG)**—have been engineered.
 
-###### Technical Architecture
+###### Technical Architecture: Standard WireGuard vs. AmneziaWG
 
-WireGuard employs:
+Standard WireGuard operates exclusively over UDP, utilizing Noise_IK handshakes with fixed message framing:
 
-- UDP-based transport (exclusively).
-- Crypto Key Routing for authentication and session management.
-- ChaCha20 for symmetric encryption.
-- Poly1305 for message authentication.
-- Curve25519 for Elliptic-curve Diffie–Hellman key exchange.
-- BLAKE2s for hashing.
-- Noise Protocol Framework for handshake.
+- **Message Type Identifiers**: 4 fixed 1-byte message types:
+  - `0x01`: Handshake Initiation (fixed size: 148 bytes).
+  - `0x02`: Handshake Response (fixed size: 92 bytes).
+  - `0x03`: Cookie Reply (fixed size: 64 bytes).
+  - `0x04`: Transport Data packet.
+- **Crypto Key Routing**: Curve25519 (ECDH), ChaCha20-Poly1305 (AEAD), BLAKE2s.
 
-###### WireGuard Wrappers and Extensions for Obfuscation
+**DPI Vulnerability**: State-level DPI (e.g., TSPU, GFW) utilizes simple heuristic matching on UDP packets: checking for `0x01` at offset 0 with a length of 148 bytes followed by `0x02` at offset 0 with a length of 92 bytes. This results in immediate, automated handshake disruption.
 
-Standard WireGuard traffic is easily identifiable by DPI due to its fixed UDP port (by default) and distinct handshake pattern. To use it in censored environments, obfuscation is necessary:
+###### AmneziaWG (AWG) Architectural Modifications
 
-1. **Encapsulation over TCP/Obfuscated Transports**:
-   - Using tools like `udptunnel`, `udp2raw`, or custom solutions to wrap WireGuard's UDP packets within TCP or another obfuscated stream.
-   - Wrapping WireGuard inside a Shadowsocks + `v2ray-plugin` (WebSocket+TLS) tunnel.
-   - Using tools like `wstunnel` to tunnel over WebSocket.
-2. **WARP (Cloudflare WARP / WARP+)**:
-   - Cloudflare's WARP service uses a modified version of WireGuard (internally named BoringTUN) often with additional encapsulation.
-   - The client software handles the obfuscation. WARP+ (paid) may offer better routing.
-   - Free WARP configurations can be extracted and used with generic WireGuard clients via tools like `wgcf`.
-   - _Effectiveness varies greatly by region and over time._
+AmneziaWG addresses this vulnerability at the protocol level by randomizing packet headers and injecting noise:
+
+1. **Header Obfuscation (`H1`–`H4`)**: Replaces static `0x01`–`0x04` message type integers with randomized 4-byte values negotiated between client and server.
+2. **Handshake Padding (`S1`, `S2`)**: Appends randomized byte padding to Handshake Initiation (`S1`) and Response (`S2`) messages, altering static packet length signatures.
+3. **Junk Packet Injection (`Jc`, `Jmin`, `Jmax`)**: Transmits a randomized number (`Jc`) of dummy UDP packets with randomized payload lengths (`Jmin`–`Jmax` bytes) prior to the real handshake initiation, desynchronizing stateful DPI packet flow inspection.
+
+###### WireGuard & AWG Wrappers
+
+Beyond AmneziaWG, standard WireGuard can be tunneled through outer steganographic overlays:
+
+1. **Encapsulation over TCP/WebSocket**:
+   - `udp2raw`: Converts WireGuard UDP into fake TCP packets with legitimate TCP sequence numbers and flags.
+   - `wstunnel` or Shadowsocks + `v2ray-plugin`: Tunnels WireGuard UDP payloads through WebSocket over TLS (port 443).
+2. **Cloudflare WARP / WARP+**:
+   - Proprietary WireGuard implementation (BoringTUN) terminating at Cloudflare edge nodes. Configurations extractable via `wgcf`.
 
 ###### Performance Characteristics
 
@@ -714,10 +746,10 @@ WireGuard offers exceptional performance in ideal network conditions:
 
 ###### Detection Resistance
 
-- **Standard WireGuard**: Poor. Easily detected and blocked by DPI.
-- **WireGuard with Obfuscation**: Detection resistance depends entirely on the quality of the obfuscation layer.
-  - If wrapped in a strong obfuscated tunnel (e.g., VLESS+XTLS or SS+v2ray-plugin), it inherits the resistance of the outer tunnel.
-  - WARP's resistance is variable and subject to Cloudflare's implementation, which can change.
+- **Raw WireGuard**: Poor. Easily detected and blocked by DPI via static 148-byte and 92-byte initiation/response signatures and UDP port patterns.
+- **AmneziaWG (AWG)**: High. Modifies handshake headers (`H1`-`H4`), appends randomized padding bytes (`S1`, `S2`), and injects noise frames (`Jc`), neutralizing heuristic DPI classification.
+- **WireGuard over Tier 3 Overlays**: Inherits the high detection resistance of the outer carrier (e.g., VLESS+Reality or WebSocket+TLS).
+- **WARP**: Variable. Subject to Cloudflare edge IP blocking and protocol changes.
 
 ###### Installation and Configuration for WireGuard
 
@@ -783,13 +815,14 @@ PersistentKeepalive = 25 # Optional, helps with NAT traversal
 
 ###### Recommendations
 
-- **Standard WireGuard is NOT recommended for use in environments with sophisticated DPI without a robust obfuscation layer.**
-- If using WireGuard in adversarial environments, prioritize wrapping it in a proven obfuscated tunnel (e.g., VLESS, Trojan, SS+PT). This combines WireGuard's performance with the outer tunnel's stealth.
-- Cloudflare WARP can be an option, but its reliability for network resilience is inconsistent and region-dependent. Test thoroughly.
-- Explore tools like `boringtun` (Cloudflare's Rust implementation) if building custom solutions.
+- **Standard WireGuard is NOT recommended for use in environments with sophisticated DPI without an obfuscation layer.**
+- For direct UDP tunneling in adversarial networks, prioritize **AmneziaWG** with randomized header parameters (`Jc/Jmin/Jmax/S1/S2/H1-H4`).
+- If using standard WireGuard, wrap it in a proven obfuscated tunnel (e.g., VLESS+XTLS, sing-box universal TUN, or Shadowsocks+v2ray-plugin).
+- Cloudflare WARP can be an option for CDN-based egress, but its reliability is region-dependent.
 
 ###### Repository References
 
+- AmneziaWG Kernel Module & Tools: [https://github.com/amnezia-vpn/amnezia-wg](https://github.com/amnezia-vpn/amnezia-wg)
 - WireGuard Official Site: [https://www.wireguard.com/](https://www.wireguard.com/)
 - WireGuard Code (Monolithic Kernel Module - Historical, now in Linux mainline): [https://git.zx2c4.com/wireguard-linux/](https://git.zx2c4.com/wireguard-linux/)
 - WireGuard-tools (Userspace utilities): [https://git.zx2c4.com/wireguard-tools/](https://git.zx2c4.com/wireguard-tools/)
@@ -1066,9 +1099,9 @@ Similar to Hysteria2, its reliance on UDP means it can be affected by blanket UD
 - TUIC Project: [https://github.com/EAimTY/tuic](https://github.com/EAimTY/tuic)
 - TUIC Protocol Specifications (often in docs or discussions within the repo)
 
-##### 3.8 Outline <a name="outline"></a>
+##### 3.8 Turnkey Orchestration Systems: Outline <a name="outline"></a>
 
-Outline is an open-source project developed by Jigsaw (a unit within Google) designed for ease of deployment and management of Shadowsocks servers, making it accessible for individuals and organizations to run their own VPN-like services.
+Unlike standalone wire protocols, Outline (developed by Jigsaw / Google) is an administrative orchestration and turnkey deployment ecosystem engineered around the Shadowsocks (AEAD) standard. It decouples server lifecycle management, credential provisioning, and client UX into dedicated software layers, reducing operational complexity while inheriting the cryptographic properties of Shadowsocks.
 
 ###### Technical Architecture
 
@@ -1205,21 +1238,19 @@ Windows offers a wide range of client implementations for resilient overlay prot
 
 ###### Comprehensive Clients (Multi-Protocol GUI)
 
-**1. Clash Verge / Clash Nyanpasu** \* _Core Engine_: Clash.Meta \* _Protocols_: VMess, VLESS, Trojan, Shadowsocks (incl. 2022), TUIC, Hysteria2, Snell, HTTP(S), SOCKS5. \* _Features_: Rich rule-based routing (domain, IP, process, geoIP), policy groups, TUN mode for system-wide VPN, profile management (local/remote), scripting, UI themes. Actively developed. \* _Installation_: Download from GitHub releases.
-_Clash Verge: [https://github.com/clash-verge-rev/clash-verge-rev](https://github.com/clash-verge-rev/clash-verge-rev)
-_ Clash Nyanpasu: [https://github.com/LibNyanpasu/clash-nyanpasu](https://github.com/LibNyanpasu/clash-nyanpasu) \* _Commentary_: Leading choice for users needing powerful routing and multi-protocol support with a polished GUI.
+**1. Clash Verge Rev / Clash Nyanpasu** \* _Core Engine_: Mihomo (formerly Clash.Meta) \* _Protocols_: VMess, VLESS, Trojan, Shadowsocks (incl. 2022), TUIC, Hysteria2, Snell, WireGuard, HTTP(S), SOCKS5. \* _Features_: Rich rule-based routing (domain, IP, process, geoIP, Mihomo rulesets), policy groups, TUN mode for system-wide VPN, profile management, scripting, UI themes. Actively developed. \* _Installation_: Download from GitHub releases.
+* Clash Verge Rev: [https://github.com/clash-verge-rev/clash-verge-rev](https://github.com/clash-verge-rev/clash-verge-rev)
+* Clash Nyanpasu: [https://github.com/LibNyanpasu/clash-nyanpasu](https://github.com/LibNyanpasu/clash-nyanpasu) \* _Commentary_: Leading choice for users needing powerful routing and multi-protocol support with a polished GUI.
 
-**2. NekoRay** \* _Core Engine_: Primarily sing-box; can also use Xray-core, V2Fly-core. \* _Protocols_: Extremely broad via sing-box (VMess, VLESS, Trojan, SS, TUIC, Hysteria2, WireGuard, ShadowTLS, NaiveProxy, etc.). \* _Features_: Profile management, subscription support, rule-based routing (less advanced than Clash but flexible), TUN mode, QR code import/export. \* _Installation_: Download from GitHub releases: [https://github.com/MatsuriDayo/nekoray](https://github.com/MatsuriDayo/nekoray) \* _Commentary_: Excellent for leveraging sing-box's versatility. UI is functional and improving.
+**2. NekoRay** \* _Core Engine_: Primarily sing-box; can also use Xray-core as backend. \* _Protocols_: Extremely broad via sing-box (VMess, VLESS, Trojan, SS-2022, TUIC, Hysteria2, WireGuard, ShadowTLS, NaiveProxy, etc.). \* _Features_: Profile management, subscription support, rule-based routing, TUN mode, QR code import/export. \* _Installation_: Download from GitHub releases: [https://github.com/MatsuriDayo/nekoray](https://github.com/MatsuriDayo/nekoray) \* _Commentary_: Excellent for leveraging sing-box's versatility.
 
-**3. v2rayN** \* _Core Engine_: Xray-core (default), V2Fly-core. \* _Protocols_: VMess, VLESS (incl. XTLS/Reality), Shadowsocks, Trojan, SOCKS, HTTP. \* _Features_: Subscription management, basic routing rules, PAC configuration, server testing, QR code support. \* _Installation_: Download from GitHub releases: [https://github.com/2dust/v2rayN](https://github.com/2dust/v2rayN) \* _Commentary_: Long-standing, reliable client, particularly strong for V2Ray/Xray specific configurations. Simpler routing than Clash or NekoRay.
+**3. v2rayN** \* _Core Engine_: Xray-core (default), sing-box, V2Fly-core. \* _Protocols_: VMess, VLESS (incl. XTLS/Reality), Shadowsocks, Trojan, SOCKS, HTTP. \* _Features_: Subscription management, basic routing rules, PAC configuration, server testing, QR code support. \* _Installation_: Download from GitHub releases: [https://github.com/2dust/v2rayN](https://github.com/2dust/v2rayN) \* _Commentary_: Long-standing, reliable client, particularly strong for V2Ray/Xray specific configurations.
 
 ###### Protocol-Specific Clients / Other Notables
 
-**1. Shadowsocks-Windows** \* _Protocols_: Shadowsocks (incl. AEAD, SS-2022 support varies by fork/version). Supports plugins. \* _Installation_: [https://github.com/shadowsocks/shadowsocks-windows](https://github.com/shadowsocks/shadowsocks-windows) \* _Commentary_: Official client, lightweight. Best used with `v2ray-plugin` for obfuscation.
+**1. Shadowsocks-Windows** \* _Protocols_: Shadowsocks (incl. AEAD, SS-2022). Supports plugins. \* _Installation_: [https://github.com/shadowsocks/shadowsocks-windows](https://github.com/shadowsocks/shadowsocks-windows) or `shadowsocks-rust`.
 
-**2. Trojan-Qt5** \* _Protocols_: Trojan. \* _Installation_: [https://github.com/Trojan-Qt5/Trojan-Qt5](https://github.com/Trojan-Qt5/Trojan-Qt5) (Maintenance status may vary). \* _Commentary_: Dedicated Trojan client, though multi-protocol clients often offer more features.
-
-**3. WireGuard for Windows** \* _Protocols_: WireGuard. \* _Installation_: Official website: [https://www.wireguard.com/install/](https://www.wireguard.com/install/) \* _Commentary_: Official, high-performance client. Remember, needs obfuscation for network resilience.
+**2. WireGuard / AmneziaWG for Windows** \* _Protocols_: WireGuard, AmneziaWG. \* _Installation_: Official website: [https://www.wireguard.com/install/](https://www.wireguard.com/install/) or [https://github.com/amnezia-vpn/amnezia-wg/releases](https://github.com/amnezia-vpn/amnezia-wg/releases).
 
 ##### 4.2 macOS Client Solutions <a name="macos-client-solutions"></a>
 
@@ -1227,46 +1258,44 @@ macOS users have access to several high-quality GUI clients.
 
 ###### Comprehensive Clients (Multi-Protocol GUI)
 
-**1. Clash Verge / Clash Nyanpasu** \* _Core Engine_: Clash.Meta \* _Protocols & Features_: Same as Windows version (see 4.1). \* _Installation_: Download from GitHub releases (see 4.1 links). \* _Commentary_: Top-tier choice on macOS for features and usability.
+**1. Clash Verge Rev / Clash Nyanpasu** \* _Core Engine_: Mihomo \* _Protocols & Features_: Same as Windows version (see 4.1). Native arm64/Intel macOS builds. \* _Installation_: Download from GitHub releases (see 4.1 links). \* _Commentary_: Top-tier desktop choice on macOS for features and usability.
 
-**2. NekoRay** \* _Core Engine_: Primarily sing-box. \* _Protocols & Features_: Same as Windows version (see 4.1). \* _Installation_: Download from GitHub releases (see 4.1 link). \* _Commentary_: Growing in popularity on macOS due to sing-box power.
+**2. NekoRay** \* _Core Engine_: Primarily sing-box. \* _Protocols & Features_: Same as Windows version (see 4.1). \* _Installation_: Download from GitHub releases (see 4.1 link).
 
-**3. Surge (Paid)** \* _Protocols_: Shadowsocks, VMess, VLESS, Trojan, Snell, HTTP(S), WireGuard, Hysteria, TUIC. \* _Features_: Extremely powerful rule engine, scripting, MitM capabilities, real-time monitoring, enhanced mode (system-wide VPN). \* _Installation_: Purchase from [https://nssurge.com/](https://nssurge.com/) \* _Commentary_: Premium, very advanced client for power users. High performance and stability.
+**3. Surge (Paid)** \* _Protocols_: Shadowsocks, VMess, VLESS, Trojan, Snell, HTTP(S), WireGuard, Hysteria, TUIC. \* _Features_: Extremely powerful rule engine, scripting, MitM capabilities, real-time monitoring, enhanced mode (system-wide VPN). \* _Installation_: Purchase from [https://nssurge.com/](https://nssurge.com/) \* _Commentary_: Premium, advanced client for power users. High performance and stability.
 
-**4. Stash (Paid, App Store)** \* _Core Engine_: Clash.Meta (internally). \* _Protocols_: Full Clash.Meta protocol support. \* _Features_: Clash-compatible configuration, rule-based routing, policy groups, profile management, polished UI. \* _Installation_: Mac App Store. \* _Commentary_: Provides a native macOS experience for Clash users, similar to Shadowrocket/Quantumult X on iOS.
-
-**5. V2RayU / V2RayX (May be less actively maintained)** \* _Core Engine_: V2Fly-core or Xray-core. \* _Protocols_: VMess, VLESS, Shadowsocks. \* _Features_: Basic V2Ray/Xray management, PAC mode. \* _Installation_: GitHub releases (e.g., V2RayU: [https://github.com/yanue/V2RayU](https://github.com/yanue/V2RayU)). \* _Commentary_: Simpler options, check maintenance status before adopting.
+**4. Stash (Paid, App Store)** \* _Core Engine_: Mihomo (internally). \* _Protocols_: Full Mihomo protocol support. \* _Features_: Clash-compatible configuration, rule-based routing, policy groups, profile management, native Apple UI. \* _Installation_: Mac App Store.
 
 ###### Protocol-Specific Clients / Other Notables
 
-**1. ShadowsocksX-NG-R** \* _Protocols_: Shadowsocks (incl. SSR, AEAD). Supports plugins. \* _Installation_: GitHub: [https://github.com/qinyuhang/ShadowsocksX-NG-R](https://github.com/qinyuhang/ShadowsocksX-NG-R) (example fork, many exist). \* _Commentary_: Popular SS client fork.
+**1. ShadowsocksX-NG** \* _Protocols_: Shadowsocks (AEAD). \* _Installation_: GitHub: [https://github.com/shadowsocks/ShadowsocksX-NG](https://github.com/shadowsocks/ShadowsocksX-NG).
 
-**2. WireGuard for macOS** \* _Protocols_: WireGuard. \* _Installation_: App Store or [https://www.wireguard.com/install/](https://www.wireguard.com/install/). \* _Commentary_: Official client.
+**2. WireGuard / AmneziaVPN for macOS** \* _Protocols_: WireGuard, AmneziaWG. \* _Installation_: Mac App Store or GitHub releases.
 
 ##### 4.3 Linux Client Solutions <a name="linux-client-solutions"></a>
 
-Linux users benefit from powerful CLI tools and increasingly capable GUI clients.
+Linux users benefit from high-performance CLI tools, eBPF-based transparent proxies, and modern GUI clients.
 
-###### Comprehensive Clients (Multi-Protocol GUI)
+###### Comprehensive Clients (Multi-Protocol GUI / Web UI)
 
-**1. Clash Verge / Clash Nyanpasu** \* _Core Engine_: Clash.Meta \* _Protocols & Features_: Same as Windows/macOS versions (see 4.1). AppImage or deb/rpm often available. \* _Installation_: Download from GitHub releases (see 4.1 links). \* _Commentary_: Excellent choice for a full-featured GUI on Linux.
+**1. Clash Verge Rev / Clash Nyanpasu** \* _Core Engine_: Mihomo \* _Protocols & Features_: Same as Windows/macOS versions (see 4.1). AppImage, deb, rpm, and arch AUR packages available. \* _Installation_: Download from GitHub releases (see 4.1 links).
 
-**2. NekoRay** \* _Core Engine_: Primarily sing-box. \* _Protocols & Features_: Same as Windows/macOS versions (see 4.1). AppImage often available. \* _Installation_: Download from GitHub releases (see 4.1 link). \* _Commentary_: Very strong contender, especially for sing-box users.
+**2. NekoRay** \* _Core Engine_: sing-box. \* _Protocols & Features_: Same as Windows/macOS versions (see 4.1). AppImage available. \* _Installation_: Download from GitHub releases (see 4.1 link).
 
-**3. Qv2ray (Maintenance status is a concern - check project activity)** \* _Core Engine_: Plugin-based, supports V2Fly-core, Xray-core, Trojan-Go, NaiveProxy, etc. \* _Protocols_: Varies by plugin. \* _Features_: Profile management, advanced routing, plugin system. \* _Installation_: GitHub: [https://github.com/Qv2ray/Qv2ray](https://github.com/Qv2ray/Qv2ray) (Check for community forks if main project is inactive). \* _Commentary_: Was a powerful cross-platform GUI. Verify current status.
+**3. v2rayA / dae (Transparent Proxy Services)** \* _Core Engine_: Xray-core / eBPF-powered packet routing (dae). \* _Protocols_: VMess, VLESS, Trojan, Shadowsocks, TUIC, Hysteria. \* _Features_: System-wide transparent proxying without client desktop overhead; web dashboard; high throughput with sub-millisecond kernel context transitions via Linux eBPF. \* _Installation_: [https://github.com/v2rayA/v2rayA](https://github.com/v2rayA/v2rayA) and [https://github.com/daeuniverse/dae](https://github.com/daeuniverse/dae).
 
 ###### Command-Line Interface (CLI) Clients (Refer to Section 8.3 for details)
 
 The primary CLI tools are the cores themselves:
 
-- **sing-box**: [https://github.com/SagerNet/sing-box](https://github.com/SagerNet/sing-box)
+- **sing-box (v1.11+)**: [https://github.com/SagerNet/sing-box](https://github.com/SagerNet/sing-box)
 - **Xray-core**: [https://github.com/XTLS/Xray-core](https://github.com/XTLS/Xray-core)
-- **Clash.Meta / Mihomo Core**: [https://github.com/MetaCubeX/Clash.Meta](https://github.com/MetaCubeX/Clash.Meta)
-- **Hysteria2 CLI**: [https://github.com/apernet/hysteria](https://github.com/apernet/hysteria)
-- **TUIC Client CLI**: [https://github.com/EAimTY/tuic](https://github.com/EAimTY/tuic)
-- **shadowsocks-libev**: [https://github.com/shadowsocks/shadowsocks-libev](https://github.com/shadowsocks/shadowsocks-libev)
+- **Mihomo Core (v1.19+)**: [https://github.com/MetaCubeX/mihomo](https://github.com/MetaCubeX/mihomo)
+- **Hysteria 2 CLI (v2.5+)**: [https://github.com/apernet/hysteria](https://github.com/apernet/hysteria)
+- **TUIC Client CLI (v5+)**: [https://github.com/EAimTY/tuic](https://github.com/EAimTY/tuic)
+- **shadowsocks-rust**: [https://github.com/shadowsocks/shadowsocks-rust](https://github.com/shadowsocks/shadowsocks-rust)
 - **trojan-go**: [https://github.com/p4gefau1t/trojan-go](https://github.com/p4gefau1t/trojan-go)
-- **wireguard-tools**: Part of WireGuard installation.
+- **amnezia-wg-tools / wireguard-tools**: Kernel and userspace CLI utilities.
 
 These are typically run as services (e.g., via systemd) and provide SOCKS5/HTTP listeners for applications to use.
 
@@ -1278,9 +1307,9 @@ Android has a vibrant ecosystem of powerful multi-protocol proxy clients.
 
 **1. NekoBox for Android** \* _Core Engine_: sing-box. \* _Protocols_: Extremely broad via sing-box (VMess, VLESS, Trojan, SS, TUIC, Hysteria2, WireGuard, ShadowTLS, etc.). \* _Features_: Profile management, subscription support, rule-based routing (domain, geoIP, app), per-app proxy, TUN mode, QR code, batch export. \* _Installation_: GitHub releases: [https://github.com/MatsuriDayo/NekoBoxForAndroid](https://github.com/MatsuriDayo/NekoBoxForAndroid) (Also on some F-Droid repos). \* _Commentary_: Arguably the most feature-rich and versatile client on Android across 2026–2027 due to sing-box integration.
 
-**2. ClashForAndroid (CFA) / ClashMetaForAndroid (CFMA)** \* _Core Engine_: Clash.Meta. \* _Protocols_: Full Clash.Meta protocol support. \* _Features_: Profile management (remote/local), rule-based routing, policy groups, per-app proxy, TUN mode, scripting. \* _Installation_:
-_CFA (Kr328, less frequent updates): [https://github.com/Kr328/ClashForAndroid](https://github.com/Kr328/ClashForAndroid)
-_ CFMA (MetaCubeX, more active): [https://github.com/MetaCubeX/ClashMetaForAndroid](https://github.com/MetaCubeX/ClashMetaForAndroid) \* _Commentary_: Powerful Clash experience on Android. CFMA is generally preferred for latest features.
+**2. ClashMetaForAndroid (CMFA / Flclash)** \* _Core Engine_: Mihomo. \* _Protocols_: Full Mihomo protocol support. \* _Features_: Profile management (remote/local), rule-based routing, policy groups, per-app proxy, TUN mode, scripting. \* _Installation_:
+* CMFA (MetaCubeX): [https://github.com/MetaCubeX/ClashMetaForAndroid](https://github.com/MetaCubeX/ClashMetaForAndroid)
+* Flclash (Cross-Platform Flutter client for Mihomo): [https://github.com/chen08209/FlClash](https://github.com/chen08209/FlClash) \* _Commentary_: Leading Mihomo-based client for Android.
 
 **3. v2rayNG** \* _Core Engine_: Xray-core, V2Fly-core. \* _Protocols_: VMess, VLESS (incl. XTLS/Reality), Shadowsocks, Trojan, SOCKS. \* _Features_: Subscription management, basic routing rules, per-app proxy, QR code support. \* _Installation_: GitHub releases: [https://github.com/2dust/v2rayNG](https://github.com/2dust/v2rayNG) (Also on Google Play, F-Droid). \* _Commentary_: Mature, stable, and widely used, especially for V2Ray/Xray protocols.
 
@@ -1300,7 +1329,7 @@ iOS client options are primarily available through the App Store and are often p
 
 **1. Shadowrocket** \* _Protocols_: Extensive support - Shadowsocks (incl. 2022, various plugins), VMess, VLESS (incl. XTLS/Reality), Trojan, Snell, HTTP(S), SOCKS5, Lua scripting, Hysteria/Hysteria2, TUIC, WireGuard. \* _Features_: Rule-based routing (domain, geoIP, scriptable), On-Demand VPN, subscription management, MitM (HTTPS decryption), traffic statistics. \* _Installation_: App Store (Paid). \* _Commentary_: Long-standing "Swiss Army knife" for iOS, known for broad protocol support and powerful features.
 
-**2. Stash** \* _Core Engine_: Clash.Meta (internally). \* _Protocols_: Full Clash.Meta protocol support. \* _Features_: Clash-compatible configuration (YAML), powerful rule-based routing, policy groups, profile management (local/remote), On-Demand VPN, MitM, polished UI. \* _Installation_: App Store (Paid). \* _Commentary_: Excellent choice for users familiar with Clash configurations, offering a robust and native iOS experience.
+**2. Stash** \* _Core Engine_: Mihomo (internally). \* _Protocols_: Full Mihomo protocol support. \* _Features_: Clash-compatible configuration (YAML), powerful rule-based routing, policy groups, profile management (local/remote), On-Demand VPN, MitM, polished UI. \* _Installation_: App Store (Paid). \* _Commentary_: Excellent choice for users familiar with Clash configurations, offering a robust and native iOS experience.
 
 **3. Quantumult X** \* _Protocols_: Shadowsocks, VMess, VLESS, Trojan, HTTP(S). Supports advanced scripting for custom protocols/rewrites. \* _Features_: Extremely powerful and flexible rule engine (regex, scripting), HTTP rewrites, task automation, MitM, On-Demand VPN. \* _Installation_: App Store (Paid). \* _Commentary_: Geared towards very advanced users and developers due to its extensive scripting capabilities. Steeper learning curve.
 
@@ -1376,7 +1405,7 @@ _ OVHcloud / SoYouStart / Kimsufi (France/Canada/Global, wide range of options) 
 **Minimum Recommended (for a few users, moderate traffic)**:
 
 - CPU: 1 vCPU/Core
-- RAM: 1GB (512MB might work for very light use, e.g., Shadowsocks-libev only)
+- RAM: 1GB (512MB suffices for lightweight single-tunnel deployments such as shadowsocks-rust or AmneziaWG)
 - Storage: 20GB NVMe/SSD
 - Bandwidth Allowance: 1TB/month
 
@@ -1701,8 +1730,8 @@ Many advanced clients support proxy chaining:
   ```
 
 - **sing-box**: Offers powerful and flexible outbound chaining capabilities in its JSON configuration. It supports various types of proxy chains, including sequential and load-balanced setups.
-- **Clash.Meta**: Supports proxy groups that can act as chains or fallbacks.
-- **GUI Clients (NekoRay, Clash Verge, etc.)**: Often provide UI elements to configure chains if their underlying core (sing-box, Clash.Meta, Xray) supports it.
+- **Mihomo (formerly Clash.Meta)**: Supports proxy groups (dialer-proxy) that act as chains or fallbacks.
+- **GUI Clients (NekoRay, Clash Verge Rev, etc.)**: Provide UI elements to configure chains across their underlying cores (sing-box, Mihomo, Xray).
 
 ###### Advantages
 
@@ -1882,7 +1911,7 @@ The proliferation of resilient overlay protocols necessitates client application
 7. **Stability and Reliability**: Consistent operation without crashes, memory leaks, or unexpected disconnections.
 8. **Security Features**: Support for latest encryption standards, proper handling of sensitive configuration data, timely updates for security vulnerabilities in client and core.
 9. **Open Source and Community Support**: Availability of source code (promotes trust and auditability), active development, responsive maintainers, community forums for support.
-10. **Core Engine Integration**: Use of up-to-date, reputable, and powerful underlying proxy engines (e.g., Xray-core, sing-box, Clash.Meta).
+10. **Core Engine Integration**: Use of up-to-date, reputable, and powerful underlying proxy engines (e.g., Xray-core, sing-box, Mihomo).
 
 ##### 8.2 GUI Solutions <a name="gui-solutions"></a>
 
@@ -1890,32 +1919,32 @@ Graphical User Interface clients are generally preferred for ease of use by a br
 
 **Leading GUI Clients (2026–2027 Benchmark):**
 
-1. **Clash Verge / Clash Nyanpasu (Cross-Platform Desktop)**
+1. **Clash Verge Rev / Clash Nyanpasu (Cross-Platform Desktop)**
 
-   - _Core Engine_: Clash.Meta
-   - _Protocols_: Extensive via Clash.Meta (VMess, VLESS, Trojan, Shadowsocks incl. 2022, TUIC, Hysteria2, Snell, HTTP(S), SOCKS5).
+   - _Core Engine_: Mihomo (formerly Clash.Meta)
+   - _Protocols_: Extensive via Mihomo (VMess, VLESS, Trojan, Shadowsocks incl. 2022, TUIC, Hysteria2, Snell, WireGuard, HTTP(S), SOCKS5).
    - _Platforms_: Windows, macOS, Linux.
-   - _Strengths_: Powerful rule-based routing (YAML configs), policy groups, TUN mode for system-wide VPN, profile management (local/remote YAML), scripting, UI themes, active development.
-   - _Commentary_: These forks of the original Clash for Windows have become highly popular, offering a rich feature set and user-friendly interface built upon the robust Clash.Meta core. They are excellent for users who need granular control over routing.
-   - _GitHub (Clash Verge)_: [https://github.com/clash-verge-rev/clash-verge-rev](https://github.com/clash-verge-rev/clash-verge-rev)
+   - _Strengths_: Powerful rule-based routing (YAML configs, Mihomo rulesets), policy groups, TUN mode for system-wide VPN, profile management (local/remote YAML), scripting, UI themes, active development.
+   - _Commentary_: These community forks have become the leading choices on desktop, offering rich feature sets and user-friendly interfaces built upon the robust Mihomo core.
+   - _GitHub (Clash Verge Rev)_: [https://github.com/clash-verge-rev/clash-verge-rev](https://github.com/clash-verge-rev/clash-verge-rev)
    - _GitHub (Clash Nyanpasu)_: [https://github.com/LibNyanpasu/clash-nyanpasu](https://github.com/LibNyanpasu/clash-nyanpasu)
 
 2. **NekoRay (Cross-Platform Desktop)**
 
-   - _Core Engine_: Primarily `sing-box`; can also use Xray-core, V2Fly-core as plugins.
-   - _Protocols_: Extremely broad via `sing-box` (VMess, VLESS, Trojan, SS, TUIC, Hysteria2, WireGuard, ShadowTLS, NaiveProxy, Tor, and more).
-   - _Platforms_: Windows, Linux. (macOS version may exist or compile but Linux/Windows are primary).
-   - _Strengths_: Leverages `sing-box`'s unparalleled versatility, supports many protocols, TUN mode, subscription support, basic rule-based routing, QR code import/export, preference for JSON configurations.
-   - _Commentary_: Rapidly gaining traction as a comprehensive solution. Its strength lies in making `sing-box`'s power accessible through a GUI.
+   - _Core Engine_: Primarily `sing-box`; can also use Xray-core as backend.
+   - _Protocols_: Extremely broad via `sing-box` (VMess, VLESS, Trojan, SS-2022, TUIC, Hysteria2, WireGuard, ShadowTLS, NaiveProxy, and more).
+   - _Platforms_: Windows, Linux.
+   - _Strengths_: Leverages `sing-box`'s versatility, supports modern protocols, TUN mode, subscription support, basic rule-based routing, QR code import/export.
+   - _Commentary_: Popular desktop client making `sing-box`'s power accessible through a GUI.
    - _GitHub_: [https://github.com/MatsuriDayo/nekoray](https://github.com/MatsuriDayo/nekoray)
 
 3. **v2rayN (Windows)**
 
-   - _Core Engine_: Xray-core (default), V2Fly-core.
+   - _Core Engine_: Xray-core (default), sing-box, V2Fly-core.
    - _Protocols_: VMess, VLESS (incl. XTLS/Reality), Shadowsocks, Trojan, SOCKS, HTTP.
    - _Platforms_: Windows.
    - _Strengths_: Mature, stable, good support for Xray/V2Ray specific features, subscription management, basic routing, PAC mode.
-   - _Commentary_: A long-standing and reliable choice for Windows users primarily focused on V2Ray/Xray protocols. Simpler than Clash Verge or NekoRay in terms of advanced routing.
+   - _Commentary_: Long-standing and reliable choice for Windows users primarily focused on V2Ray/Xray protocols.
    - _GitHub_: [https://github.com/2dust/v2rayN](https://github.com/2dust/v2rayN)
 
 4. **Shadowrocket (iOS - Paid)**
@@ -1927,10 +1956,10 @@ Graphical User Interface clients are generally preferred for ease of use by a br
 
 5. **Stash (iOS/macOS - Paid)**
 
-   - _Core Engine_: Clash.Meta (internally).
-   - _Protocols_: Full Clash.Meta support.
+   - _Core Engine_: Mihomo (internally).
+   - _Protocols_: Full Mihomo support.
    - _Platforms_: iOS, macOS (Mac App Store version).
-   - _Strengths_: Clash-compatible, powerful rules, policy groups, polished UI, On-Demand VPN.
+   - _Strengths_: Clash-compatible, powerful rules, policy groups, polished native UI, On-Demand VPN.
    - _Commentary_: Excellent for users who prefer the Clash ecosystem, providing a native Apple platform experience.
 
 6. **NekoBox for Android (Android)**
@@ -1944,8 +1973,8 @@ Graphical User Interface clients are generally preferred for ease of use by a br
 
 7. **ClashMetaForAndroid (CFMA) (Android)**
 
-   - _Core Engine_: Clash.Meta.
-   - _Protocols_: Full Clash.Meta support.
+   - _Core Engine_: Mihomo.
+   - _Protocols_: Full Mihomo support.
    - _Platforms_: Android.
    - _Strengths_: Powerful Clash features, TUN mode, per-app proxy, active development.
    - _Commentary_: A leading Clash-based client for Android.
@@ -1965,69 +1994,63 @@ Command-Line Interface clients are favored by advanced users, for server deploym
 
 **Leading CLI Cores/Clients (2026–2027 Benchmark):**
 
-1. **sing-box**
+1. **sing-box (v1.11+)**
 
-   - _Protocols_: VMess, VLESS, Trojan, Shadowsocks, Hysteria/Hysteria2, TUIC, WireGuard, NaiveProxy, SOCKS, HTTP, ShadowTLS, Tor, and more.
-   - _Platforms_: Windows, macOS, Linux, Android (core), iOS (core potential).
-   - _Strengths_: The most versatile "all-in-one" proxy platform. Extensive protocol and feature support (TUN, complex routing, DNS, etc.). Powerful JSON-based configuration. Actively developed. Can function as both client and server.
-   - _Commentary_: Has become a leading choice for a universal proxy core due to its breadth of features and robust implementation.
+   - _Protocols_: VMess, VLESS, Trojan, Shadowsocks-2022, Hysteria 2, TUIC v5, WireGuard, NaiveProxy, SOCKS, HTTP, ShadowTLS, Tor, and more.
+   - _Platforms_: Windows, macOS, Linux, Android (core), iOS (core).
+   - _Strengths_: Universal "all-in-one" proxy platform. Universal TUN engine, rule-sets with direct binary GeoIP/GeoSite compilation, advanced DNS router. Highly memory-efficient JSON configuration. Functions as both client and server.
+   - _Commentary_: De facto standard for universal proxy cores due to broad feature integration and high performance.
    - _GitHub_: [https://github.com/SagerNet/sing-box](https://github.com/SagerNet/sing-box)
    - _Documentation_: [https://sing-box.sagernet.org/](https://sing-box.sagernet.org/)
 
 2. **Xray-core**
 
    - _Protocols_: VLESS (XTLS, Vision, Reality), VMess, Trojan, Shadowsocks, SOCKS, HTTP.
-   - _Platforms_: Windows, macOS, Linux, Android/iOS (as a core library).
-   - _Strengths_: High performance (especially VLESS+XTLS/Reality), robust, well-tested, extensive configuration options (JSON).
-   - _Commentary_: The direct successor/enhancement of V2Ray-core. Xray-core is a benchmark for performance and advanced features like Reality.
+   - _Platforms_: Windows, macOS, Linux, Android/iOS (as core library).
+   - _Strengths_: High performance (especially VLESS+XTLS/Reality), robust, well-tested, extensive configuration options (JSON). Benchmark for Reality TLS camouflage.
    - _GitHub_: [https://github.com/XTLS/Xray-core](https://github.com/XTLS/Xray-core)
 
-3. **Clash.Meta / Mihomo Core**
-   - _Protocols_: Shadowsocks (incl. 2022), VMess, VLESS, Trojan, Snell, TUIC, Hysteria2, HTTP, SOCKS5.
+3. **Mihomo Core (v1.19+, formerly Clash.Meta)**
+   - _Protocols_: Shadowsocks (incl. 2022), VMess, VLESS, Trojan, Snell, TUIC v5, Hysteria 2, WireGuard, HTTP, SOCKS5.
    - _Platforms_: Windows, macOS, Linux.
-   - _Strengths_: Powerful rule engine (YAML configs), policy groups, TUN support, RESTful API for control, widely adopted by GUI clients.
-   - _Commentary_: The open-source core powering many Clash-based GUIs. Provides a robust CLI experience.
-   - _GitHub_: [https://github.com/MetaCubeX/Clash.Meta](https://github.com/MetaCubeX/Clash.Meta)
+   - _Strengths_: Powerful rule engine (YAML / Mihomo Rule-Providers), policy groups, TUN support, RESTful API for external control, widely adopted by GUI clients.
+   - _Commentary_: The open-source core powering modern Clash-based GUIs.
+   - _GitHub_: [https://github.com/MetaCubeX/mihomo](https://github.com/MetaCubeX/mihomo)
 
-_(Other CLIs like `shadowsocks-libev`, `trojan-go`, Hysteria2/TUIC CLIs are also excellent for their specific protocols but `sing-box`, `Xray-core`, and `Clash.Meta` offer broader multi-protocol CLI capabilities)._
+_(Other CLIs like `shadowsocks-rust`, `trojan-go`, Hysteria 2, and TUIC CLIs are also excellent for their specific protocols, while `sing-box`, `Xray-core`, and `Mihomo` offer broad multi-protocol routing capabilities)._
 
 ##### 8.4 TUI Solutions <a name="tui-solutions"></a>
 
-Text-based User Interface clients offer a middle ground, providing interactivity in terminal environments, useful for headless servers or users who prefer terminal-based management.
+Text-based User Interface clients provide interactivity in terminal environments, useful for headless servers or users who prefer terminal management.
 
 **Leading TUI Approaches (2026–2027 Benchmark):**
 
-1. **Clash TUI / Web Dashboards for Clash.Meta**
+1. **Mihomo TUI & Web Dashboards**
 
-   - While not a standalone TUI app, Clash.Meta's API allows for external controllers.
-   - **yacd (Yet Another Clash Dashboard)**: A popular web-based dashboard for Clash. Can be run locally and accessed via a browser, providing TUI-like control.
-     - _GitHub_: [https://github.com/MetaCubeX/yacd](https://github.com/MetaCubeX/yacd)
-   - Other terminal-based TUIs might exist as community projects that interface with the Clash API.
-   - _Commentary_: Useful for managing Clash instances, switching proxies/policies, viewing logs and traffic from a terminal-accessible interface.
+   - Mihomo's RESTful controller API enables external web and terminal dashboards:
+   - **yacd (Yet Another Clash Dashboard)** / **MetaCubeX Dashboard**: Browser dashboards connectable locally to Mihomo instances.
+     - _GitHub_: [https://github.com/MetaCubeX/metacubexd](https://github.com/MetaCubeX/metacubexd)
+   - _Commentary_: Useful for managing proxy groups, switching nodes, and inspecting real-time connections from a terminal-accessible web port.
 
 2. **sing-box-dashboard**
 
-   - A web dashboard for `sing-box`, similar in concept to yacd for Clash.
+   - Web dashboard for `sing-box`, interfacing with the experimental Clash API listener.
    - _GitHub_: [https://github.com/SagerNet/sing-box-dashboard](https://github.com/SagerNet/sing-box-dashboard)
-   - _Commentary_: Provides a web UI to interact with a running `sing-box` instance, useful for TUI-like management.
 
 3. **Custom Scripts / Wrappers**
-   - Many advanced users create their own TUI-like scripts using tools like `fzf`, `dialog`, `ncurses`, or simple shell scripting to manage configurations and connections for `sing-box` or `Xray-core`.
-   - _Commentary_: Highly customizable but requires scripting knowledge. No single dominant project.
-
-_The dedicated TUI application landscape for these specific multi-protocol tools is less mature compared to GUI or pure CLI. Users often rely on web dashboards run locally or script their own interactions._
+   - Interactive shell wrappers utilizing `fzf`, `dialog`, or `ncurses` to manage configurations and active tunnels for `sing-box` or `Xray-core`.
 
 ##### 8.5 Platform-Specific Recommendations Summary (2026–2027 Best Overall) <a name="platform-specific-recommendations-summary-clients"></a>
 
-- **Windows (GUI)**: **Clash Verge / Nyanpasu** (for advanced rules & Clash ecosystem) or **NekoRay** (for `sing-box` versatility & broad protocol support). **v2rayN** remains a solid, simpler choice for V2Ray/Xray.
-- **macOS (GUI)**: **Clash Verge / Nyanpasu** or **Stash** (for Clash ecosystem). **NekoRay** (for `sing-box`). **Surge** (paid) for ultimate power users.
-- **Linux (GUI)**: **Clash Verge / Nyanpasu** or **NekoRay**.
-- **Linux (CLI/TUI)**: **sing-box** (most versatile CLI), **Xray-core** (high-performance CLI for its protocols), **Clash.Meta / Mihomo Core** (CLI with TUI/Web dashboard options via API).
-- **Android**: **NekoBox for Android** (`sing-box` based, most versatile), **ClashMetaForAndroid (CFMA)** (Clash.Meta based, powerful rules), **v2rayNG** (Xray focus, very stable).
-- **iOS (Paid)**: **Shadowrocket** (broadest protocol support & features) or **Stash** (Clash ecosystem & rules). **Quantumult X / Loon / Surge** for very advanced users.
+- **Windows (GUI)**: **Clash Verge Rev / Nyanpasu** (for advanced rules & Mihomo ecosystem) or **NekoRay** (for `sing-box` versatility & broad protocol support). **v2rayN** remains a solid choice for V2Ray/Xray.
+- **macOS (GUI)**: **Clash Verge Rev / Nyanpasu** or **Stash** (for Mihomo ecosystem). **NekoRay** (for `sing-box`). **Surge** (paid) for power users.
+- **Linux (GUI / Web)**: **Clash Verge Rev / Nyanpasu**, **NekoRay**, or **v2rayA** / **dae** (for transparent system-wide eBPF routing).
+- **Linux (CLI)**: **sing-box** (most versatile CLI), **Xray-core** (high-performance Reality CLI), **Mihomo Core** (CLI with REST API dashboard support).
+- **Android**: **NekoBox for Android** (`sing-box` based, most versatile), **ClashMetaForAndroid (CFMA)** (Mihomo based, powerful rules), **v2rayNG** (Xray focus, very stable).
+- **iOS (Paid)**: **Shadowrocket** (broadest protocol support & features) or **Stash** (Mihomo ecosystem & rules). **Quantumult X / Loon / Surge** for advanced users.
 
 **Overall "Best" Solution Approach**:
-For users seeking a unified experience across multiple platforms with the widest protocol support and advanced features, solutions based on **`sing-box` (e.g., NekoRay/NekoBox)** or **Clash.Meta (e.g., Clash Verge/Nyanpasu, Stash, CFMA)** are generally the top contenders in 2026–2027. For CLI power users, `sing-box` itself stands out for its sheer breadth of capabilities. The choice often comes down to preference for configuration style (JSON for `sing-box`/Xray vs. YAML for Clash) and specific feature requirements.
+For users seeking a unified experience across multiple platforms with the widest protocol support and advanced features, solutions based on **`sing-box` (e.g., NekoRay/NekoBox)** or **Mihomo (e.g., Clash Verge Rev/Nyanpasu, Stash, CFMA)** are the top contenders in 2026–2027. For CLI power users, `sing-box` stands out for its sheer breadth of capabilities. The choice often comes down to preference for configuration style (JSON for `sing-box`/Xray vs. YAML for Mihomo) and specific routing requirements.
 
 #### 9. Protocol Efficacy and Threat Model Alignment (2026–2027) <a name="protocol-efficacy-primacy"></a>
 
@@ -2195,7 +2218,7 @@ Strong OpSec is vital for both users of resilient transport tools and operators 
 
 1. **Software Provenance**: Download client software and core engines _only_ from official, trusted sources (project GitHub releases, official websites, reputable app stores). Verify checksums/signatures if provided.
 2. **Configuration Secrecy**: Do not share your personal server details (IPs, ports, UUIDs, passwords, private keys) publicly or on insecure channels. Use secure methods (e.g., PGP-encrypted email, Signal) for sharing with trusted individuals if necessary.
-3. **Regular Updates**: Keep client software, underlying cores (Xray, sing-box, Clash.Meta), operating systems, and browsers updated to patch known vulnerabilities.
+3. **Regular Updates**: Keep client software, underlying cores (Xray, sing-box, Mihomo), operating systems, and browsers updated to patch known vulnerabilities.
 4. **System Security**: Maintain a secure computing environment: strong unique passwords, multi-factor authentication where possible, system firewall enabled, reputable anti-malware software (if applicable to OS).
 5. **DNS Leak Prevention**: Ensure DNS requests are routed through the tunnel. Most modern clients handle this correctly (often by proxying DNS or using a DNS server accessible only through the tunnel), but verification using sites like [https://www.dnsleaktest.com/](https://www.dnsleaktest.com/) or [https://browserleaks.com/dns](https://browserleaks.com/dns) is recommended after connecting.
 6. **Kill Switch**: Utilize client features or system firewall rules to implement a "kill switch" that blocks all internet traffic if the resilient transport tool disconnects unexpectedly. This prevents your real IP address from leaking. Many advanced clients (Clash Verge, NekoRay with TUN mode) provide this.
@@ -2235,11 +2258,11 @@ While individual project GitHub repositories have been linked throughout this do
 - **sing-box Ecosystem**:
   - Core Project: [https://github.com/SagerNet/sing-box](https://github.com/SagerNet/sing-box)
   - Official Documentation: [https://sing-box.sagernet.org/](https://sing-box.sagernet.org/)
-- **Clash Ecosystem**:
-  - Clash.Meta / Mihomo Core: [https://github.com/MetaCubeX/Clash.Meta](https://github.com/MetaCubeX/Clash.Meta)
-  - Clash Verge GUI (Cross-Platform): [https://github.com/clash-verge-rev/clash-verge-rev](https://github.com/clash-verge-rev/clash-verge-rev)
-  - Yacd Dashboard (Web UI for Clash): [https://github.com/MetaCubeX/yacd](https://github.com/MetaCubeX/yacd)
-- **Shadowsocks Organization**: [https://github.com/shadowsocks](https://github.com/shadowsocks) (Hosts various SS implementations like shadowsocks-libev, shadowsocks-rust, plugins)
+- **Mihomo Ecosystem (formerly Clash.Meta)**:
+  - Mihomo Core: [https://github.com/MetaCubeX/mihomo](https://github.com/MetaCubeX/mihomo)
+  - Clash Verge Rev GUI: [https://github.com/clash-verge-rev/clash-verge-rev](https://github.com/clash-verge-rev/clash-verge-rev)
+  - MetaCubeX Dashboard: [https://github.com/MetaCubeX/metacubexd](https://github.com/MetaCubeX/metacubexd)
+- **Shadowsocks Organization**: [https://github.com/shadowsocks](https://github.com/shadowsocks) (Hosts reference implementations like shadowsocks-rust and official SIP plugins)
 - **Tor Project Source Code & Pluggable Transports**:
   - Tor Project GitLab: [https://gitlab.torproject.org/tpo/](https://gitlab.torproject.org/tpo/)
 - **Hysteria Project**:
@@ -2316,7 +2339,7 @@ The landscape of network interference and resilient transport protocols across 2
 
 Key findings indicate that protocols leveraging robust TLS mimicry, such as **VLESS + XTLS (particularly with Xray-core's Reality feature)** and **Trojan-Go (with uTLS and strong fallback)**, currently offer a leading combination of high resistance and performance against prevalent mechanisms. QUIC-based protocols like **Hysteria2** and **TUIC** demonstrate exceptional efficacy in challenging network conditions characterized by high packet loss, provided UDP is not overly restricted. The strategic use of CDNs to front WebSocket-based transports remains a vital technique for masking server IPs and blending traffic with general web activity.
 
-Client-side, comprehensive multi-protocol solutions such as **Clash Verge/Nyanpasu (Clash.Meta based)**, **NekoRay/NekoBox (sing-box based)**, and mobile-specific powerhouses like **Shadowrocket (iOS)** and **NekoBox for Android** provide users with versatile tools to manage and deploy these diverse protocols. For CLI users, **`sing-box`** has emerged as a remarkably flexible and powerful "all-in-one" proxy platform, with **Xray-core** and **Clash.Meta** also offering robust CLI capabilities.
+Client-side, comprehensive multi-protocol solutions such as **Clash Verge Rev/Nyanpasu (Mihomo based)**, **NekoRay/NekoBox (sing-box based)**, and mobile-specific powerhouses like **Shadowrocket (iOS)** and **NekoBox for Android** provide users with versatile tools to manage and deploy these diverse protocols. For CLI users, **`sing-box`** has emerged as a remarkably flexible and powerful "all-in-one" proxy platform, with **Xray-core** and **Mihomo Core** also offering robust CLI capabilities.
 
 Advanced techniques, including bridge-based systems (especially Tor's obfs4 and Snowflake), multi-hop configurations, and the ongoing development of pliable, environment-sensitive transports, highlight the community's innovative capacity. Future trends point towards increased use of AI/ML in both adversarial traffic classification and automated transport morphing, the critical need for post-quantum cryptographic agility in the medium term, and the growing potential of decentralized P2P approaches and privacy-enhancing technologies like Encrypted Client Hello (ECH).
 
